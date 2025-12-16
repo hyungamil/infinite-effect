@@ -29,7 +29,7 @@
             justify-content: center;
             background: linear-gradient(to bottom, #cfd9df 0%, #e2ebf0 100%);
             transition: filter 1s ease;
-            overflow: hidden; /* 회전 시 스크롤 방지 */
+            overflow: hidden;
         }
         canvas {
             position: absolute;
@@ -79,7 +79,6 @@
             box-shadow: 0 0 30px rgba(236, 201, 75, 0.4), inset 0 0 20px rgba(100, 80, 20, 0.8);
         }
         
-        /* 인게임 미니 랭킹 */
         .ingame-rank-panel {
             background: rgba(0, 0, 0, 0.6);
             border: 1px solid #4a5568;
@@ -94,7 +93,6 @@
             text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
         }
 
-        /* 컨트롤 버튼 */
         .controls {
             display: flex;
             width: 100%;
@@ -144,7 +142,6 @@
             pointer-events: none;
         }
 
-        /* 애니메이션 */
         @keyframes blink-red {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.3; }
@@ -184,7 +181,6 @@
             transition: opacity 0.2s;
         }
         
-        /* 버튼 비활성화 스타일 */
         .btn-disabled {
             background: #4a5568 !important;
             border-color: #2d3748 !important;
@@ -193,16 +189,13 @@
             opacity: 0.7;
         }
 
-        /* --- 헬 모드 전용 효과 (추가됨) --- */
-        
-        /* 1. 눈보라 레이어 (화면 하얗게) */
         #blizzard-layer {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
             background: white;
             opacity: 0;
             pointer-events: none;
-            z-index: 8; /* 눈 내리는 캔버스보다 위 */
+            z-index: 8;
             transition: opacity 2s ease;
             mix-blend-mode: hard-light;
         }
@@ -211,20 +204,32 @@
         }
         @keyframes blizzard-pulse {
             0% { opacity: 0.85; }
-            50% { opacity: 0.95; } /* 거의 안 보임 */
+            50% { opacity: 0.95; }
             100% { opacity: 0.88; }
         }
 
-        /* 2. 현기증 효과 (화면 회전) */
         .active-dizziness {
             animation: dizziness-spin 3s infinite ease-in-out !important;
         }
         @keyframes dizziness-spin {
             0% { transform: rotate(0deg) scale(1); }
-            25% { transform: rotate(-5deg) scale(1.1); } /* 여백 방지 확대 */
+            25% { transform: rotate(-5deg) scale(1.1); }
             50% { transform: rotate(0deg) scale(1); }
             75% { transform: rotate(5deg) scale(1.1); }
             100% { transform: rotate(0deg) scale(1); }
+        }
+        
+        /* 음악 재생 버튼 스타일 */
+        #musicToggleBtn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: 2px solid #a3bffa;
+            box-shadow: 0 0 15px rgba(118, 75, 162, 0.5);
+            animation: pulse-purple 2s infinite;
+        }
+        @keyframes pulse-purple {
+            0% { box-shadow: 0 0 0 0 rgba(118, 75, 162, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(118, 75, 162, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(118, 75, 162, 0); }
         }
 
     </style>
@@ -236,19 +241,13 @@
     <canvas id="snow-canvas"></canvas>
     
     <!-- 
-      [중요] 오디오 태그: 파일 이름을 bgm.mp3 로 변경했습니다.
-      깃허브에 올린 파일 이름도 꼭 bgm.mp3 로 바꿔주세요!
+      [중요] 오디오 태그: ./bgm.mp3 로 경로 명시
     -->
-    <audio id="bgm" loop preload="auto">
-        <source src="bgm.mp3" type="audio/mpeg">
-    </audio>
+    <audio id="bgm" src="./bgm.mp3" type="audio/mpeg" loop preload="auto"></audio>
 
-    <!-- 눈보라 효과 레이어 -->
     <div id="blizzard-layer"></div>
 
-    <!-- UI 레이어 -->
     <div class="ui-layer">
-        <!-- 상단 정보 -->
         <div class="p-4 w-full flex justify-between items-start">
             <div class="military-panel p-3 rounded w-32 interactive cursor-pointer hover:bg-gray-800 transition">
                 <div id="secretTrigger" class="text-xs text-green-500 uppercase tracking-wider mb-1">점수 (Score)</div>
@@ -267,7 +266,6 @@
             </div>
         </div>
 
-        <!-- 연료 게이지 -->
         <div class="absolute top-28 left-1/2 transform -translate-x-1/2 w-64 md:w-80">
             <div class="flex justify-between text-xs text-gray-400 mb-1 font-bold shadow-black drop-shadow-md">
                 <span>E</span>
@@ -283,7 +281,6 @@
         <div class="h-[25vh]"></div>
     </div>
 
-    <!-- 컨트롤러 -->
     <div class="controls fixed bottom-0 left-0 w-full">
         <div id="btnTurn" class="control-btn btn-turn">
             <span class="icon">↺</span>
@@ -295,7 +292,6 @@
         </div>
     </div>
 
-    <!-- 시작 화면 -->
     <div id="startModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm interactive px-4">
         <div class="military-panel p-6 w-full max-w-sm text-center rounded-lg border-green-900/50 relative">
             <h1 class="text-4xl md:text-5xl mb-2 text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]" style="font-family: 'Black Han Sans'; letter-spacing: -1px;">무한의 전차<br><span class="text-2xl text-gray-400 font-normal tracking-widest">HELL TRAINING</span></h1>
@@ -314,6 +310,13 @@
                 <p class="text-xs text-green-600 mb-1 font-mono">파일럿 이름 (PILOT NAME) <span class="text-red-500">*</span></p>
                 <input type="text" id="usernameInput" placeholder="이름을 입력하세요" maxlength="10" class="w-full bg-transparent text-white border-b border-green-700 focus:border-green-400 outline-none font-mono text-lg uppercase text-center transition-colors">
                 <div id="nameErrorMsg" class="text-xs text-red-400 mt-1 text-center font-bold">이미 사용 중인 이름입니다!</div>
+            </div>
+
+            <!-- 음악 강제 재생 버튼 추가 -->
+            <div class="mb-4">
+                <button id="musicToggleBtn" class="w-full text-white font-bold py-2 rounded text-sm font-mono tracking-widest">
+                    🎵 BGM ON (눌러서 테스트)
+                </button>
             </div>
 
             <div class="flex gap-2 mb-4">
@@ -336,11 +339,10 @@
         </div>
     </div>
 
-    <!-- 랭킹 모달 -->
+    <!-- 나머지 모달들은 기존과 동일 (생략 없이 포함) -->
     <div id="rankingModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md interactive px-4 hidden">
         <div class="military-panel p-6 w-full max-w-sm text-center rounded-lg border-blue-900/50 h-[60vh] flex flex-col">
             <h2 class="text-3xl text-blue-400 mb-4 font-black tracking-tighter">명예의 전당</h2>
-            
             <div class="bg-black/40 rounded p-4 w-full flex-1 border border-gray-700 overflow-y-auto mb-4">
                 <div class="flex justify-between text-xs text-gray-500 mb-2 border-b border-gray-800 pb-1 uppercase font-mono">
                     <span class="w-8">순위</span>
@@ -351,119 +353,62 @@
                     <div class="text-center text-gray-500 mt-10">데이터 로딩 중...</div>
                 </div>
             </div>
-
-            <button id="closeRankBtn" class="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 rounded border border-gray-500 shadow-lg font-mono">
-                닫기
-            </button>
+            <button id="closeRankBtn" class="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 rounded border border-gray-500 shadow-lg font-mono">닫기</button>
         </div>
     </div>
 
-    <!-- 경고 모달 -->
     <div id="warningModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-red-900/40 backdrop-blur-sm interactive px-4 hidden">
         <div class="military-panel-red p-6 w-full max-w-sm text-center rounded-lg relative overflow-hidden">
             <div class="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(255,0,0,0.02),rgba(255,0,0,0.06))] bg-[length:100%_4px,3px_100%] pointer-events-none"></div>
-            
             <h2 class="text-4xl text-red-500 mb-4 font-black tracking-tighter warning-blink">⚠ 경 고 ⚠</h2>
             <p class="text-white text-lg font-mono mb-2">시스템 해킹됨</p>
-            <p class="text-red-300 text-sm font-mono mb-6 border-y border-red-800 py-2 leading-relaxed">
-                조작키가 반전되었습니다.<br>
-                (위치가 서로 바뀝니다!)<br>
-                <span class="text-green-400 block mt-2 font-bold">에너지 충전 완료.</span>
-            </p>
-            
-            <button id="resumeBtn" class="w-full bg-red-900 hover:bg-red-800 text-white font-bold py-4 rounded border border-red-500 shadow-[0_0_15px_rgba(255,0,0,0.4)] transition font-mono tracking-widest text-xl">
-                수동 제어 시작
-            </button>
+            <p class="text-red-300 text-sm font-mono mb-6 border-y border-red-800 py-2 leading-relaxed">조작키가 반전되었습니다.<br>(위치가 서로 바뀝니다!)<br><span class="text-green-400 block mt-2 font-bold">에너지 충전 완료.</span></p>
+            <button id="resumeBtn" class="w-full bg-red-900 hover:bg-red-800 text-white font-bold py-4 rounded border border-red-500 shadow-[0_0_15px_rgba(255,0,0,0.4)] transition font-mono tracking-widest text-xl">수동 제어 시작</button>
         </div>
     </div>
 
-    <!-- 헬 모드 모달 -->
     <div id="hellModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-purple-900/40 backdrop-blur-sm interactive px-4 hidden">
         <div class="military-panel-purple p-6 w-full max-w-sm text-center rounded-lg relative overflow-hidden">
             <h2 class="text-4xl text-purple-400 mb-4 font-black tracking-tighter hell-blink">⚠ 헬 모드 ⚠</h2>
             <p class="text-white text-lg font-mono mb-2">시야/평형 감각 상실</p>
-            <p class="text-purple-300 text-sm font-mono mb-6 border-y border-purple-800 py-2 leading-relaxed">
-                눈보라가 몰아치고<br>
-                화면이 어지럽게 회전합니다!<br>
-                <span class="text-green-400 block mt-2 font-bold">에너지 충전 완료.</span>
-            </p>
-            
-            <button id="hellResumeBtn" class="w-full bg-purple-900 hover:bg-purple-800 text-white font-bold py-4 rounded border border-purple-500 shadow-[0_0_15px_rgba(128,0,128,0.4)] transition font-mono tracking-widest text-xl">
-                지옥에서 생존하라
-            </button>
+            <p class="text-purple-300 text-sm font-mono mb-6 border-y border-purple-800 py-2 leading-relaxed">눈보라가 몰아치고<br>화면이 어지럽게 회전합니다!<br><span class="text-green-400 block mt-2 font-bold">에너지 충전 완료.</span></p>
+            <button id="hellResumeBtn" class="w-full bg-purple-900 hover:bg-purple-800 text-white font-bold py-4 rounded border border-purple-500 shadow-[0_0_15px_rgba(128,0,128,0.4)] transition font-mono tracking-widest text-xl">지옥에서 생존하라</button>
         </div>
     </div>
 
-    <!-- 미션 완료 모달 -->
     <div id="confirmSecretModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md interactive px-4 hidden">
         <div class="military-panel-gold p-6 w-full max-w-sm text-center rounded-lg relative overflow-hidden">
             <h2 class="text-4xl text-yellow-400 mb-4 font-black tracking-tighter">작전 성공</h2>
-            <p class="text-white text-md font-mono mb-6 leading-relaxed break-keep">
-                축하합니다, 사령관님.<br>
-                지옥 훈련을 통과하고 살아남으셨습니다.<br><br>
-                이제 1급 기밀인<br>
-                <span class="text-yellow-300 font-bold">'무한의 계단 고수 비법'</span>을<br>
-                열람하시겠습니까?
-            </p>
-            
-            <button id="revealSecretBtn" class="w-full bg-yellow-700 hover:bg-yellow-600 text-white font-bold py-4 rounded border border-yellow-400 shadow-[0_0_20px_rgba(236,201,75,0.5)] transition font-mono tracking-widest text-xl animate-pulse">
-                비급 전수받기
-            </button>
+            <p class="text-white text-md font-mono mb-6 leading-relaxed break-keep">축하합니다, 사령관님.<br>지옥 훈련을 통과하고 살아남으셨습니다.<br><br>이제 1급 기밀인<br><span class="text-yellow-300 font-bold">'무한의 계단 고수 비법'</span>을<br>열람하시겠습니까?</p>
+            <button id="revealSecretBtn" class="w-full bg-yellow-700 hover:bg-yellow-600 text-white font-bold py-4 rounded border border-yellow-400 shadow-[0_0_20px_rgba(236,201,75,0.5)] transition font-mono tracking-widest text-xl animate-pulse">비급 전수받기</button>
         </div>
     </div>
 
-    <!-- 최종 비결 모달 -->
     <div id="victoryModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-yellow-900/40 backdrop-blur-md interactive px-4 hidden">
         <div class="military-panel p-6 w-full max-w-sm text-center rounded-lg border-yellow-500">
             <h2 class="text-4xl text-yellow-400 mb-4 font-black tracking-tighter">임무 완수</h2>
             <p class="text-gray-300 text-sm font-mono mb-4">비밀 파일 해독 완료.</p>
-            
-            <div class="bg-black/60 p-6 border border-yellow-700 rounded mb-6">
-                <h3 class="text-yellow-500 text-lg mb-2 font-bold">[전설의 비결]</h3>
-                <p class="text-white font-mono text-2xl leading-relaxed break-keep">
-                    "그냥 많이 하면 늡니다."
-                </p>
-            </div>
-            
-            <button id="victoryRestartBtn" class="w-full bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-3 rounded border border-yellow-500 shadow-lg font-mono">
-                타이틀로 복귀
-            </button>
+            <div class="bg-black/60 p-6 border border-yellow-700 rounded mb-6"><h3 class="text-yellow-500 text-lg mb-2 font-bold">[전설의 비결]</h3><p class="text-white font-mono text-2xl leading-relaxed break-keep">"그냥 많이 하면 늡니다."</p></div>
+            <button id="victoryRestartBtn" class="w-full bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-3 rounded border border-yellow-500 shadow-lg font-mono">타이틀로 복귀</button>
         </div>
     </div>
 
-    <!-- 게임 오버 모달 -->
     <div id="gameOverModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-red-900/20 backdrop-blur-md interactive px-4 hidden">
         <div class="military-panel p-6 w-full max-w-sm text-center border-red-900/50">
             <h2 class="text-4xl text-red-500 mb-2 font-black tracking-tighter">작전 실패</h2>
             <p class="text-gray-400 text-xs mb-4 uppercase">임무에 실패했습니다</p>
-            
             <div class="text-6xl mb-6 text-white hud-text" id="finalScore">0</div>
-            
-            <div class="bg-black/40 rounded p-4 w-full mb-6 border border-gray-700 max-h-48 overflow-y-auto">
-                <h3 class="text-left text-xs text-gray-500 mb-2 border-b border-gray-800 pb-1 uppercase">최정예 파일럿 (Top Aces)</h3>
-                <div id="leaderboardList" class="space-y-1 text-sm font-mono">
-                </div>
-            </div>
-
-            <div class="flex gap-2">
-                <button id="homeBtn" class="flex-1 bg-gray-600 hover:bg-gray-500 text-white font-bold py-3 rounded border border-gray-400 shadow-lg font-mono">
-                    홈으로
-                </button>
-                <button id="restartBtn" class="flex-1 bg-red-800 hover:bg-red-700 text-white font-bold py-3 rounded border border-red-600 shadow-lg font-mono">
-                    재도전
-                </button>
-            </div>
+            <div class="bg-black/40 rounded p-4 w-full mb-6 border border-gray-700 max-h-48 overflow-y-auto"><h3 class="text-left text-xs text-gray-500 mb-2 border-b border-gray-800 pb-1 uppercase">최정예 파일럿 (Top Aces)</h3><div id="leaderboardList" class="space-y-1 text-sm font-mono"></div></div>
+            <div class="flex gap-2"><button id="homeBtn" class="flex-1 bg-gray-600 hover:bg-gray-500 text-white font-bold py-3 rounded border border-gray-400 shadow-lg font-mono">홈으로</button><button id="restartBtn" class="flex-1 bg-red-800 hover:bg-red-700 text-white font-bold py-3 rounded border border-red-600 shadow-lg font-mono">재도전</button></div>
         </div>
     </div>
 </div>
 
-<!-- Firebase SDK -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, collection, addDoc, setDoc, getDoc, getDocs, doc, onSnapshot, query, where, orderBy, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // --- Firebase Setup ---
     const firebaseConfig = {
         apiKey: "AIzaSyAeSmWC9q32i9Px_hljTKvewql6At5v8MU",
         authDomain: "infinite-effect.firebaseapp.com",
@@ -476,11 +421,9 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    
     let currentUser = null;
     let unsubscribeLeaderboard = null;
 
-    // --- Auth Logic ---
     async function initFirebase() {
         try {
             await signInAnonymously(auth);
@@ -505,10 +448,8 @@
             }
         }
     });
-
     initFirebase();
 
-    // --- Game Logic ---
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     const snowCanvas = document.getElementById('snow-canvas');
@@ -516,7 +457,7 @@
     const gameContainer = document.getElementById('game-container');
     const blizzardLayer = document.getElementById('blizzard-layer');
     
-    // UI Elements
+    // UI Elements & Buttons
     const startModal = document.getElementById('startModal');
     const gameOverModal = document.getElementById('gameOverModal');
     const rankingModal = document.getElementById('rankingModal');
@@ -535,6 +476,7 @@
     const hellResumeBtn = document.getElementById('hellResumeBtn');
     const revealSecretBtn = document.getElementById('revealSecretBtn');
     const victoryRestartBtn = document.getElementById('victoryRestartBtn');
+    const musicToggleBtn = document.getElementById('musicToggleBtn');
     
     const scoreDisplay = document.getElementById('scoreDisplay');
     const bestDisplay = document.getElementById('bestDisplay');
@@ -548,24 +490,17 @@
     const statusText = document.getElementById('statusText');
     const statusPanel = document.getElementById('statusPanel');
     const secretTrigger = document.getElementById('secretTrigger');
-    
-    // 배경음악 요소
     const bgm = document.getElementById('bgm');
-
-    // Buttons
     const controlsDiv = document.querySelector('.controls');
     const btnTurn = document.getElementById('btnTurn');
     const btnClimb = document.getElementById('btnClimb');
 
-    // Constants
     const BLOCK_SIZE_W = 70;
     const BLOCK_SIZE_H = 25; 
     const SPACING_X = 85; 
     const SPACING_Y = 55;
     const MAX_ENERGY = 100;
-    const MAX_SCORE = 1000;
     
-    // Game State
     let gameState = 'MENU';
     let score = 0;
     let energy = MAX_ENERGY;
@@ -574,25 +509,44 @@
     let playerIndex = 0; 
     let playerFacing = 1; 
     let bestScore = 0;
-    
     let isReverseMode = false;
     let isHellMode = false;
-    
-    // Snow
     let snowflakes = [];
     const MAX_SNOWFLAKES = 150;
     let shakeIntensity = 0;
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    // -----------------------------------------------------
+    // 🎵 음악 진단 및 재생 로직 (핵심 수정)
+    // -----------------------------------------------------
     
-    // 배경음악 재생 함수
-    function playBGM() {
-        if (bgm) {
-            bgm.volume = 0.5; // 볼륨 50%
-            bgm.play().catch(e => {
-                console.log("Autoplay prevented by browser. Music will start on interaction.");
-            });
+    // 1. 음악 파일 에러 감지 (404 등) -> 경고창 띄움
+    bgm.addEventListener('error', (e) => {
+        const error = e.target.error;
+        let msg = "알 수 없는 에러";
+        if (error.code === error.MEDIA_ERR_SRC_NOT_SUPPORTED) msg = "파일 경로/형식 문제 (404 Not Found)";
+        
+        console.error("BGM Error:", msg);
+        alert(`⚠ 음악 재생 불가 ⚠\n원인: ${msg}\n\n깃허브에 파일이 올라갔는지, 'bgm.mp3' 소문자가 맞는지 확인하세요!`);
+        
+        // UI에도 빨간 표시
+        if (statusText) {
+            statusText.innerText = "BGM 파일 없음 (Error)";
+            statusText.classList.add("text-red-500", "warning-blink");
         }
-    }
+    });
+
+    // 2. 버튼 클릭 시 강제 재생 (브라우저 정책 우회)
+    musicToggleBtn.addEventListener('click', () => {
+        bgm.volume = 0.5;
+        bgm.play().then(() => {
+            alert("🎵 음악 재생 성공!\n이제 게임을 시작하세요.");
+            musicToggleBtn.innerText = "재생 중 (Music ON)";
+            musicToggleBtn.classList.remove("animate-pulse");
+        }).catch((e) => {
+            alert(`⚠ 재생 실패 ⚠\n브라우저나 파일 문제일 수 있습니다.\n에러: ${e.message}`);
+        });
+    });
 
     function stopBGM() {
         if (bgm) {
@@ -601,6 +555,7 @@
         }
     }
 
+    // (기존 효과음 함수 유지)
     function playSound(type) {
         if (audioCtx.state === 'suspended') audioCtx.resume();
         try {
@@ -609,66 +564,32 @@
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             const now = audioCtx.currentTime;
-
             if (type === 'move') {
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(60, now);
-                osc.frequency.exponentialRampToValueAtTime(30, now + 0.2);
-                gain.gain.setValueAtTime(0.3, now);
-                gain.gain.linearRampToValueAtTime(0, now + 0.2);
-                osc.start();
-                osc.stop(now + 0.2);
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(60, now); osc.frequency.exponentialRampToValueAtTime(30, now + 0.2); gain.gain.setValueAtTime(0.3, now); gain.gain.linearRampToValueAtTime(0, now + 0.2); osc.start(); osc.stop(now + 0.2);
             } else if (type === 'error') {
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(100, now);
-                osc.frequency.exponentialRampToValueAtTime(10, now + 0.5);
-                gain.gain.setValueAtTime(0.5, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
-                osc.start();
-                osc.stop(now + 0.5);
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(100, now); osc.frequency.exponentialRampToValueAtTime(10, now + 0.5); gain.gain.setValueAtTime(0.5, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5); osc.start(); osc.stop(now + 0.5);
             } else if (type === 'alarm') {
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(800, now);
-                osc.frequency.linearRampToValueAtTime(400, now + 0.5);
-                gain.gain.setValueAtTime(0.3, now);
-                gain.gain.linearRampToValueAtTime(0, now + 0.5);
-                osc.start();
-                osc.stop(now + 0.5);
+                osc.type = 'square'; osc.frequency.setValueAtTime(800, now); osc.frequency.linearRampToValueAtTime(400, now + 0.5); gain.gain.setValueAtTime(0.3, now); gain.gain.linearRampToValueAtTime(0, now + 0.5); osc.start(); osc.stop(now + 0.5);
             }
         } catch(e) {}
     }
 
-    // High DPI Handling
     function resize() {
         const dpr = window.devicePixelRatio || 1;
-        canvas.style.width = window.innerWidth + 'px';
-        canvas.style.height = window.innerHeight + 'px';
-        snowCanvas.style.width = window.innerWidth + 'px';
-        snowCanvas.style.height = window.innerHeight + 'px';
-        canvas.width = window.innerWidth * dpr;
-        canvas.height = window.innerHeight * dpr;
-        snowCanvas.width = window.innerWidth * dpr;
-        snowCanvas.height = window.innerHeight * dpr;
-        ctx.setTransform(1, 0, 0, 1, 0, 0); 
-        ctx.scale(dpr, dpr);
-        snowCtx.setTransform(1, 0, 0, 1, 0, 0);
-        snowCtx.scale(dpr, dpr);
+        canvas.style.width = window.innerWidth + 'px'; canvas.style.height = window.innerHeight + 'px';
+        snowCanvas.style.width = window.innerWidth + 'px'; snowCanvas.style.height = window.innerHeight + 'px';
+        canvas.width = window.innerWidth * dpr; canvas.height = window.innerHeight * dpr;
+        snowCanvas.width = window.innerWidth * dpr; snowCanvas.height = window.innerHeight * dpr;
+        ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.scale(dpr, dpr);
+        snowCtx.setTransform(1, 0, 0, 1, 0, 0); snowCtx.scale(dpr, dpr);
         ctx.imageSmoothingEnabled = false; 
     }
     window.addEventListener('resize', resize);
     
-    // --- Snow ---
     function initSnow() {
         snowflakes = [];
         for(let i=0; i<MAX_SNOWFLAKES; i++) {
-            snowflakes.push({
-                x: Math.random() * window.innerWidth,
-                y: Math.random() * window.innerHeight,
-                r: Math.random() * 2 + 1,
-                d: Math.random() * MAX_SNOWFLAKES,
-                vx: Math.random() * 1 - 0.5,
-                vy: Math.random() * 2 + 1
-            });
+            snowflakes.push({ x: Math.random() * window.innerWidth, y: Math.random() * window.innerHeight, r: Math.random() * 2 + 1, d: Math.random() * MAX_SNOWFLAKES, vx: Math.random() * 1 - 0.5, vy: Math.random() * 2 + 1 });
         }
     }
 
@@ -678,141 +599,75 @@
         snowCtx.beginPath();
         for(let i=0; i<MAX_SNOWFLAKES; i++) {
             let p = snowflakes[i];
-            snowCtx.moveTo(p.x, p.y);
-            snowCtx.arc(p.x, p.y, p.r, 0, Math.PI*2, true);
-            p.y += p.vy;
-            p.x += p.vx + Math.sin(Date.now() * 0.001 + p.d) * 0.5;
-            if(p.y > window.innerHeight) {
-                p.y = -10;
-                p.x = Math.random() * window.innerWidth;
-            }
+            snowCtx.moveTo(p.x, p.y); snowCtx.arc(p.x, p.y, p.r, 0, Math.PI*2, true);
+            p.y += p.vy; p.x += p.vx + Math.sin(Date.now() * 0.001 + p.d) * 0.5;
+            if(p.y > window.innerHeight) { p.y = -10; p.x = Math.random() * window.innerWidth; }
         }
         snowCtx.fill();
     }
 
-    // --- Debug ---
-    let secretClickCount = 0;
-    let secretTimer;
-
+    let secretClickCount = 0; let secretTimer;
     secretTrigger.addEventListener('click', (e) => {
-        e.preventDefault();
-        secretClickCount++;
-        clearTimeout(secretTimer);
+        e.preventDefault(); secretClickCount++; clearTimeout(secretTimer);
         secretTimer = setTimeout(() => { secretClickCount = 0; }, 500);
-        if (secretClickCount >= 3) {
-            secretClickCount = 0;
-            activateCheat();
-        }
+        if (secretClickCount >= 3) { secretClickCount = 0; activateCheat(); }
     });
 
     function activateCheat() {
         let prevScore = score;
-        if (score < 499) {
-            score = 499;
-            energyDrainRate = 1.0;
-        } else if (score < 749) {
-            score = 749;
-            energyDrainRate = 1.2;
-        } else if (score < 999) {
-            score = 999;
-            energyDrainRate = 1.3;
-        }
+        if (score < 499) { score = 499; energyDrainRate = 1.0; } 
+        else if (score < 749) { score = 749; energyDrainRate = 1.2; } 
+        else if (score < 999) { score = 999; energyDrainRate = 1.3; }
         if (prevScore !== score) {
-            scoreDisplay.textContent = score;
-            scoreDisplay.style.color = '#4ade80';
+            scoreDisplay.textContent = score; scoreDisplay.style.color = '#4ade80';
             setTimeout(() => { scoreDisplay.style.color = 'white'; }, 300);
-            energy = MAX_ENERGY;
-            energyBar.style.width = '100%';
+            energy = MAX_ENERGY; energyBar.style.width = '100%';
         }
     }
 
-    // --- Game Initialization Logic ---
     function initializeStairs() {
-        stairs = [];
-        let currentDir = 1; 
+        stairs = []; let currentDir = 1; 
         for(let i=0; i<5; i++) stairs.push(1);
-        for(let i=0; i<50; i++) {
-            if(Math.random() < 0.3) currentDir *= -1;
-            stairs.push(currentDir);
-        }
-        playerIndex = 0;
-        playerFacing = 1;
+        for(let i=0; i<50; i++) { if(Math.random() < 0.3) currentDir *= -1; stairs.push(currentDir); }
+        playerIndex = 0; playerFacing = 1;
     }
 
     async function validateAndStartGame() {
         if (!currentUser) {
             const name = usernameInput.value.trim();
-            if (!name) {
-                usernameInput.classList.add('input-error');
-                setTimeout(() => usernameInput.classList.remove('input-error'), 300);
-                return;
-            }
-            initGame();
-            return;
+            if (!name) { usernameInput.classList.add('input-error'); setTimeout(() => usernameInput.classList.remove('input-error'), 300); return; }
+            initGame(); return;
         }
-        
         const name = usernameInput.value.trim();
-        if (!name) {
-            usernameInput.classList.add('input-error');
-            setTimeout(() => usernameInput.classList.remove('input-error'), 300);
-            return;
-        }
-
+        if (!name) { usernameInput.classList.add('input-error'); setTimeout(() => usernameInput.classList.remove('input-error'), 300); return; }
         try {
-            const checkPromise = new Promise(async (resolve, reject) => {
+            const checkPromise = new Promise(async (resolve) => {
                 const q = query(getCollectionPath(), where("name", "==", name));
                 const snapshot = await getDocs(q);
                 let isDuplicate = false;
-                snapshot.forEach((doc) => {
-                    if (doc.id !== currentUser.uid) {
-                        isDuplicate = true;
-                    }
-                });
+                snapshot.forEach((doc) => { if (doc.id !== currentUser.uid) isDuplicate = true; });
                 resolve(isDuplicate);
             });
-
             const timeoutPromise = new Promise((resolve) => setTimeout(() => resolve(false), 3000));
             const isDuplicate = await Promise.race([checkPromise, timeoutPromise]);
-
             if (isDuplicate) {
-                nameErrorMsg.style.opacity = '1';
-                usernameInput.classList.add('input-error');
-                setTimeout(() => {
-                    usernameInput.classList.remove('input-error');
-                    setTimeout(() => nameErrorMsg.style.opacity = '0', 2000);
-                }, 300);
+                nameErrorMsg.style.opacity = '1'; usernameInput.classList.add('input-error');
+                setTimeout(() => { usernameInput.classList.remove('input-error'); setTimeout(() => nameErrorMsg.style.opacity = '0', 2000); }, 300);
                 return;
             }
-            
             initGame();
-        } catch (e) {
-            console.error("Name check failed", e);
-            initGame();
-        }
+        } catch (e) { console.error("Name check failed", e); initGame(); }
     }
 
     function initGame() {
-        score = 0;
-        energy = MAX_ENERGY;
-        energyDrainRate = 0.3;
-        shakeIntensity = 0;
-        isReverseMode = false;
-        isHellMode = false;
-        secretClickCount = 0;
-        
-        statusText.textContent = "정상 모드";
-        statusText.className = "text-xs text-green-400 font-mono tracking-widest";
+        score = 0; energy = MAX_ENERGY; energyDrainRate = 0.3; shakeIntensity = 0;
+        isReverseMode = false; isHellMode = false; secretClickCount = 0;
+        statusText.textContent = "정상 모드"; statusText.className = "text-xs text-green-400 font-mono tracking-widest";
         statusPanel.className = "military-panel p-2 rounded px-4";
-        scoreDisplay.textContent = score;
-        scoreDisplay.style.color = 'white';
-        shuffleAlert.style.opacity = '0';
+        scoreDisplay.textContent = score; scoreDisplay.style.color = 'white'; shuffleAlert.style.opacity = '0';
         
-        // 버튼 순서 초기화
-        if (controlsDiv.children[0] !== btnTurn) {
-            controlsDiv.insertBefore(btnTurn, btnClimb);
-        }
+        if (controlsDiv.children[0] !== btnTurn) controlsDiv.insertBefore(btnTurn, btnClimb);
         
-        // 헬 모드 효과 제거
         blizzardLayer.classList.remove('active');
         gameContainer.classList.remove('active-dizziness');
         gameContainer.classList.remove('whiteout-effect');
@@ -821,99 +676,54 @@
         initializeStairs();
         gameState = 'PLAYING';
         
-        // 게임 시작 시 음악 재생 시도
-        playBGM();
+        // 게임 시작 시 버튼 눌렀다면 이미 재생 중일 것임.
+        // 혹시 모르니 다시 시도
+        bgm.play().catch(()=>{});
 
-        startModal.classList.add('hidden');
-        rankingModal.classList.add('hidden');
-        gameOverModal.classList.add('hidden');
-        warningModal.classList.add('hidden');
-        hellModal.classList.add('hidden');
-        confirmSecretModal.classList.add('hidden');
-        victoryModal.classList.add('hidden');
+        startModal.classList.add('hidden'); rankingModal.classList.add('hidden'); gameOverModal.classList.add('hidden');
+        warningModal.classList.add('hidden'); hellModal.classList.add('hidden');
+        confirmSecretModal.classList.add('hidden'); victoryModal.classList.add('hidden');
     }
 
     function goToHome() {
         gameState = 'MENU';
-        // 홈으로 가면 음악 정지 (선택 사항)
         stopBGM();
-        
-        gameOverModal.classList.add('hidden');
-        victoryModal.classList.add('hidden');
-        startModal.classList.remove('hidden');
-        
-        // 효과 제거
-        blizzardLayer.classList.remove('active');
-        gameContainer.classList.remove('active-dizziness');
-        gameContainer.classList.remove('whiteout-effect');
-        
-        canvas.style.transform = 'rotate(0deg)';
-        energyBar.style.width = '100%';
-        score = 0;
-        scoreDisplay.textContent = 0;
+        gameOverModal.classList.add('hidden'); victoryModal.classList.add('hidden'); startModal.classList.remove('hidden');
+        blizzardLayer.classList.remove('active'); gameContainer.classList.remove('active-dizziness');
+        gameContainer.classList.remove('whiteout-effect'); canvas.style.transform = 'rotate(0deg)';
+        energyBar.style.width = '100%'; score = 0; scoreDisplay.textContent = 0;
         initializeStairs(); 
-        if (controlsDiv.children[0] !== btnTurn) {
-            controlsDiv.insertBefore(btnTurn, btnClimb);
-        }
+        if (controlsDiv.children[0] !== btnTurn) controlsDiv.insertBefore(btnTurn, btnClimb);
+        
+        // 버튼 텍스트 초기화
+        musicToggleBtn.innerText = "🎵 BGM ON (눌러서 테스트)";
+        musicToggleBtn.classList.add("animate-pulse");
     }
 
     function showRankings() { rankingModal.classList.remove('hidden'); }
     function hideRankings() { rankingModal.classList.add('hidden'); }
-
+    
     function triggerReverseMode() {
-        gameState = 'PAUSED';
-        playSound('alarm');
-        warningModal.classList.remove('hidden');
-        isReverseMode = true;
-        energy = MAX_ENERGY;
-        energyBar.style.width = '100%';
+        gameState = 'PAUSED'; playSound('alarm'); warningModal.classList.remove('hidden');
+        isReverseMode = true; energy = MAX_ENERGY; energyBar.style.width = '100%';
         controlsDiv.insertBefore(btnClimb, btnTurn);
-        statusText.textContent = "⚠ 반전 모드 ⚠";
-        statusText.className = "text-xs text-red-500 font-mono tracking-widest warning-blink";
+        statusText.textContent = "⚠ 반전 모드 ⚠"; statusText.className = "text-xs text-red-500 font-mono tracking-widest warning-blink";
         statusPanel.className = "military-panel-red p-2 rounded px-4";
     }
 
     function triggerHellMode() {
-        gameState = 'PAUSED';
-        playSound('alarm');
-        hellModal.classList.remove('hidden');
-        isHellMode = true;
-        isReverseMode = false;
-        
-        // 헬 모드에서는 버튼 정상 위치로 (시각 효과에 집중)
-        if (controlsDiv.children[0] !== btnTurn) {
-            controlsDiv.insertBefore(btnTurn, btnClimb);
-        }
-        
-        // 시각 효과 적용 (눈보라 + 현기증)
-        blizzardLayer.classList.add('active');
-        gameContainer.classList.add('active-dizziness');
-        
-        energy = MAX_ENERGY;
-        energyBar.style.width = '100%';
-        
-        // UI 텍스트 변경
-        statusText.textContent = "⚠ HELL MODE ⚠";
-        statusText.className = "text-xs text-purple-400 font-mono tracking-widest hell-blink";
+        gameState = 'PAUSED'; playSound('alarm'); hellModal.classList.remove('hidden');
+        isHellMode = true; isReverseMode = false;
+        if (controlsDiv.children[0] !== btnTurn) controlsDiv.insertBefore(btnTurn, btnClimb);
+        blizzardLayer.classList.add('active'); gameContainer.classList.add('active-dizziness');
+        energy = MAX_ENERGY; energyBar.style.width = '100%';
+        statusText.textContent = "⚠ HELL MODE ⚠"; statusText.className = "text-xs text-purple-400 font-mono tracking-widest hell-blink";
         statusPanel.className = "military-panel-purple p-2 rounded px-4";
     }
 
-    function resumeGame() {
-        gameState = 'PLAYING';
-        warningModal.classList.add('hidden');
-        hellModal.classList.add('hidden');
-    }
-    
-    function triggerConfirmSecret() {
-        gameState = 'GAMEOVER'; 
-        saveScore(score); 
-        confirmSecretModal.classList.remove('hidden');
-    }
-
-    function revealSecret() {
-        confirmSecretModal.classList.add('hidden');
-        victoryModal.classList.remove('hidden');
-    }
+    function resumeGame() { gameState = 'PLAYING'; warningModal.classList.add('hidden'); hellModal.classList.add('hidden'); }
+    function triggerConfirmSecret() { gameState = 'GAMEOVER'; saveScore(score); confirmSecretModal.classList.remove('hidden'); }
+    function revealSecret() { confirmSecretModal.classList.add('hidden'); victoryModal.classList.remove('hidden'); }
 
     function generateStairs() {
         while (stairs.length < playerIndex + 50) {
@@ -926,63 +736,31 @@
 
     function checkMove(action) {
         if (gameState !== 'PLAYING') return;
-
-        if (score === 500 && !isReverseMode && !isHellMode) {
-            triggerReverseMode();
-            return;
-        }
-        if (score === 750 && !isHellMode) {
-            triggerHellMode();
-            return;
-        }
-
-        let intendedDirection = playerFacing;
-        let actualAction = action;
-        if (actualAction === 'TURN') intendedDirection *= -1;
+        if (score === 500 && !isReverseMode && !isHellMode) { triggerReverseMode(); return; }
+        if (score === 750 && !isHellMode) { triggerHellMode(); return; }
         
+        let intendedDirection = playerFacing;
+        if (action === 'TURN') intendedDirection *= -1;
         let nextStairDirection = stairs[playerIndex + 1];
         
         if (intendedDirection === nextStairDirection) {
-            playerIndex++;
-            playerFacing = intendedDirection;
-            score++;
-            scoreDisplay.textContent = score;
-            playSound('move');
-            shakeIntensity = 3; 
-            
-            energy += 12; 
-            if (energy > MAX_ENERGY) energy = MAX_ENERGY;
-            
+            playerIndex++; playerFacing = intendedDirection;
+            score++; scoreDisplay.textContent = score; playSound('move'); shakeIntensity = 3;
+            energy += 12; if (energy > MAX_ENERGY) energy = MAX_ENERGY;
             energyDrainRate = Math.min(0.3 + (score * 0.0012), 1.5);
             if (isHellMode) energyDrainRate = 1.2;
-
-            if (score >= 1000) {
-                triggerConfirmSecret();
-                return;
-            }
+            if (score >= 1000) { triggerConfirmSecret(); return; }
             generateStairs();
         } else {
-            shakeIntensity = 10;
-            gameOver();
+            shakeIntensity = 10; gameOver();
         }
     }
 
     function gameOver() {
         if(gameOverModal) gameOverModal.classList.remove('hidden');
-        
-        // 게임 오버 시 음악 정지
-        stopBGM();
-
-        gameState = 'GAMEOVER';
-        playSound('error');
-        
+        stopBGM(); gameState = 'GAMEOVER'; playSound('error');
         if(finalScoreDisplay) finalScoreDisplay.textContent = score;
-        
-        if (score > bestScore) {
-            bestScore = score;
-            if(bestDisplay) bestDisplay.textContent = bestScore;
-        }
-        
+        if (score > bestScore) { bestScore = score; if(bestDisplay) bestDisplay.textContent = bestScore; }
         saveScore(score).catch(e => console.log('Save skipped'));
     }
 
@@ -990,358 +768,121 @@
         if (gameState !== 'PLAYING') return;
         energy -= energyDrainRate;
         if(energyBar) energyBar.style.width = `${Math.max(0, (energy / MAX_ENERGY) * 100)}%`;
-        
-        if (energy <= 0) {
-            gameOver();
-            return;
-        }
-        
+        if (energy <= 0) { gameOver(); return; }
         if (shakeIntensity > 0) shakeIntensity *= 0.9;
     }
 
-    // --- Drawing ---
     function drawBackground(ctx) {
         const gradient = ctx.createLinearGradient(0, 0, 0, window.innerHeight);
-        if (isHellMode) {
-            gradient.addColorStop(0, '#2d3748'); 
-            gradient.addColorStop(1, '#553c9a');
-        } else if (isReverseMode) {
-            gradient.addColorStop(0, '#2c0b0e'); 
-            gradient.addColorStop(1, '#4a1010');
-        } else {
-            gradient.addColorStop(0, '#757f9a'); 
-            gradient.addColorStop(1, '#d7dde8');
-        }
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+        if (isHellMode) { gradient.addColorStop(0, '#2d3748'); gradient.addColorStop(1, '#553c9a'); } 
+        else if (isReverseMode) { gradient.addColorStop(0, '#2c0b0e'); gradient.addColorStop(1, '#4a1010'); } 
+        else { gradient.addColorStop(0, '#757f9a'); gradient.addColorStop(1, '#d7dde8'); }
+        ctx.fillStyle = gradient; ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
         
-        ctx.save();
-        ctx.fillStyle = '#4a5568'; 
+        ctx.save(); ctx.fillStyle = '#4a5568'; 
         for(let i=0; i<10; i++) {
             let x = (i * 150) - (playerIndex * 20) % 1500; 
-            let h = 100 + Math.random() * 50;
-            let y = window.innerHeight - 150; 
-            ctx.beginPath();
-            ctx.moveTo(x, y);
-            ctx.lineTo(x + 10, y - h);
-            ctx.lineTo(x + 20, y);
-            ctx.fill();
+            let h = 100 + Math.random() * 50; let y = window.innerHeight - 150; 
+            ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + 10, y - h); ctx.lineTo(x + 20, y); ctx.fill();
         }
-        ctx.fillStyle = '#cbd5e0';
-        ctx.fillRect(0, window.innerHeight - 150, window.innerWidth, 150);
-        ctx.restore();
+        ctx.fillStyle = '#cbd5e0'; ctx.fillRect(0, window.innerHeight - 150, window.innerWidth, 150); ctx.restore();
     }
 
     function drawTank(ctx, x, y, facing) {
-        const scale = 0.8;
-        ctx.save();
-        ctx.translate(x, y - 10);
-        ctx.scale(facing * scale, scale); 
-        
-        const camoGreen = '#4B5320'; 
-        const camoWhite = '#F0F0F0'; 
-        const trackColor = '#1a202c'; 
-        const wheelColor = '#2d3748';
-        
-        ctx.fillStyle = trackColor;
-        ctx.fillRect(-25, 10, 50, 12);
-        
-        ctx.fillStyle = wheelColor;
-        for(let i=0; i<4; i++) {
-            ctx.beginPath();
-            ctx.arc(-18 + (i * 12), 16, 5, 0, Math.PI*2);
-            ctx.fill();
-        }
-
-        ctx.beginPath();
-        ctx.moveTo(-25, 10);
-        ctx.lineTo(25, 10); 
-        ctx.lineTo(30, 0);  
-        ctx.lineTo(15, -8); 
-        ctx.lineTo(-25, -8); 
-        ctx.lineTo(-28, 0); 
-        ctx.closePath();
-        ctx.fillStyle = camoGreen;
-        ctx.fill();
-        
-        ctx.fillStyle = camoWhite;
-        ctx.beginPath();
-        ctx.moveTo(-10, 10);
-        ctx.lineTo(10, 10);
-        ctx.lineTo(5, 0);
-        ctx.fill();
-        ctx.fillStyle = '#222';
-        ctx.fillRect(-20, -6, 10, 4);
-
-        ctx.beginPath();
-        ctx.arc(0, -8, 14, Math.PI, 0); 
-        ctx.lineTo(10, -5);
-        ctx.lineTo(-10, -5);
-        ctx.closePath();
-        ctx.fillStyle = camoGreen;
-        ctx.fill();
-        
-        ctx.fillStyle = camoWhite;
-        ctx.beginPath();
-        ctx.arc(-5, -12, 5, 0, Math.PI*2);
-        ctx.fill();
-
-        ctx.fillStyle = '#2F3530'; 
-        ctx.fillRect(10, -12, 35, 6); 
-        ctx.fillStyle = '#111';
-        ctx.fillRect(40, -14, 5, 10);
-
-        ctx.fillStyle = '#c53030';
-        ctx.beginPath();
-        ctx.arc(0, -8, 3, 0, Math.PI*2);
-        ctx.fill();
-        ctx.restore();
+        const scale = 0.8; ctx.save(); ctx.translate(x, y - 10); ctx.scale(facing * scale, scale); 
+        const camoGreen = '#4B5320'; const camoWhite = '#F0F0F0'; const trackColor = '#1a202c'; const wheelColor = '#2d3748';
+        ctx.fillStyle = trackColor; ctx.fillRect(-25, 10, 50, 12);
+        ctx.fillStyle = wheelColor; for(let i=0; i<4; i++) { ctx.beginPath(); ctx.arc(-18 + (i * 12), 16, 5, 0, Math.PI*2); ctx.fill(); }
+        ctx.beginPath(); ctx.moveTo(-25, 10); ctx.lineTo(25, 10); ctx.lineTo(30, 0); ctx.lineTo(15, -8); ctx.lineTo(-25, -8); ctx.lineTo(-28, 0); ctx.closePath(); ctx.fillStyle = camoGreen; ctx.fill();
+        ctx.fillStyle = camoWhite; ctx.beginPath(); ctx.moveTo(-10, 10); ctx.lineTo(10, 10); ctx.lineTo(5, 0); ctx.fill();
+        ctx.fillStyle = '#222'; ctx.fillRect(-20, -6, 10, 4);
+        ctx.beginPath(); ctx.arc(0, -8, 14, Math.PI, 0); ctx.lineTo(10, -5); ctx.lineTo(-10, -5); ctx.closePath(); ctx.fillStyle = camoGreen; ctx.fill();
+        ctx.fillStyle = camoWhite; ctx.beginPath(); ctx.arc(-5, -12, 5, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#2F3530'; ctx.fillRect(10, -12, 35, 6); ctx.fillStyle = '#111'; ctx.fillRect(40, -14, 5, 10);
+        ctx.fillStyle = '#c53030'; ctx.beginPath(); ctx.arc(0, -8, 3, 0, Math.PI*2); ctx.fill(); ctx.restore();
     }
 
     function drawSnowyBlock(ctx, x, y, isCurrent) {
-        const w = BLOCK_SIZE_W;
-        const h = 25; 
-        const depth = 35; 
-
-        let earthTop = '#4a5568';
-        let earthBot = '#2d3748';
-        if (isReverseMode) {
-            earthTop = '#3b1010'; 
-            earthBot = '#1a0505';
-        }
-
+        const w = BLOCK_SIZE_W; const h = 25; const depth = 35; 
+        let earthTop = '#4a5568'; let earthBot = '#2d3748';
+        if (isReverseMode) { earthTop = '#3b1010'; earthBot = '#1a0505'; }
         const earthGradient = ctx.createLinearGradient(x, y + h, x, y + h + depth);
-        earthGradient.addColorStop(0, earthTop); 
-        earthGradient.addColorStop(1, earthBot); 
-        
-        ctx.fillStyle = earthGradient;
-        ctx.beginPath();
-        ctx.moveTo(x - w/2 + 2, y + h); 
-        ctx.lineTo(x + w/2 - 2, y + h);
-        ctx.lineTo(x + w/2, y + h + depth);
-        ctx.lineTo(x - w/2, y + h + depth);
-        ctx.closePath();
-        ctx.fill();
-
-        ctx.fillStyle = '#1a202c';
-        ctx.fillRect(x - 10, y + h + 10, 5, 5);
-        ctx.fillRect(x + 15, y + h + 20, 4, 3);
-
-        ctx.fillStyle = '#f7fafc'; 
-        ctx.beginPath();
-        ctx.moveTo(x - w/2, y);
-        ctx.lineTo(x + w/2, y);
-        ctx.lineTo(x + w/2, y + h);
-        ctx.lineTo(x + w/4, y + h + 3); 
-        ctx.lineTo(x, y + h - 2); 
-        ctx.lineTo(x - w/4, y + h + 3); 
-        ctx.lineTo(x - w/2, y + h);
-        ctx.closePath();
-        ctx.fill();
-
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(x - w/2 + 5, y + 2, w - 10, 5);
-        
-        if (!isCurrent) {
-            ctx.fillStyle = 'rgba(0,0,0,0.1)';
-            ctx.fillRect(x - w/2, y, w, h);
-        }
+        earthGradient.addColorStop(0, earthTop); earthGradient.addColorStop(1, earthBot); 
+        ctx.fillStyle = earthGradient; ctx.beginPath(); ctx.moveTo(x - w/2 + 2, y + h); ctx.lineTo(x + w/2 - 2, y + h); ctx.lineTo(x + w/2, y + h + depth); ctx.lineTo(x - w/2, y + h + depth); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = '#1a202c'; ctx.fillRect(x - 10, y + h + 10, 5, 5); ctx.fillRect(x + 15, y + h + 20, 4, 3);
+        ctx.fillStyle = '#f7fafc'; ctx.beginPath(); ctx.moveTo(x - w/2, y); ctx.lineTo(x + w/2, y); ctx.lineTo(x + w/2, y + h); ctx.lineTo(x + w/4, y + h + 3); ctx.lineTo(x, y + h - 2); ctx.lineTo(x - w/4, y + h + 3); ctx.lineTo(x - w/2, y + h); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = '#ffffff'; ctx.fillRect(x - w/2 + 5, y + 2, w - 10, 5);
+        if (!isCurrent) { ctx.fillStyle = 'rgba(0,0,0,0.1)'; ctx.fillRect(x - w/2, y, w, h); }
     }
 
     function draw() {
         if (!stairs || stairs.length === 0) return;
-
-        ctx.save();
-        let dx = (Math.random() - 0.5) * shakeIntensity;
-        let dy = (Math.random() - 0.5) * shakeIntensity;
-        ctx.translate(dx, dy);
-        
+        ctx.save(); let dx = (Math.random() - 0.5) * shakeIntensity; let dy = (Math.random() - 0.5) * shakeIntensity; ctx.translate(dx, dy);
         drawBackground(ctx);
-        
-        const centerX = window.innerWidth / 2;
-        const centerY = window.innerHeight * 0.7;
-        ctx.translate(centerX, centerY);
-        
+        const centerX = window.innerWidth / 2; const centerY = window.innerHeight * 0.7; ctx.translate(centerX, centerY);
         function getOffset(targetI) {
-            let dx = 0;
-            let dy = 0;
-            if (targetI === playerIndex) return {x:0, y:0};
-            if (targetI > playerIndex) {
-                for(let k=playerIndex + 1; k<=targetI; k++) {
-                    let dir = stairs[k];
-                    dx += (dir * SPACING_X); 
-                    dy -= SPACING_Y; 
-                }
-            } else {
-                for(let k=playerIndex; k > targetI; k--) {
-                    let dir = stairs[k];
-                    dx -= (dir * SPACING_X);
-                    dy += SPACING_Y;
-                }
-            }
+            let dx = 0; let dy = 0; if (targetI === playerIndex) return {x:0, y:0};
+            if (targetI > playerIndex) { for(let k=playerIndex + 1; k<=targetI; k++) { let dir = stairs[k]; dx += (dir * SPACING_X); dy -= SPACING_Y; } } 
+            else { for(let k=playerIndex; k > targetI; k--) { let dir = stairs[k]; dx -= (dir * SPACING_X); dy += SPACING_Y; } }
             return {x: dx, y: dy};
         }
-        
-        for (let i = playerIndex + 12; i >= Math.max(0, playerIndex - 3); i--) {
-            let pos = getOffset(i);
-            drawSnowyBlock(ctx, pos.x, pos.y, i === playerIndex);
-        }
-        drawTank(ctx, 0, 0, playerFacing);
-        ctx.restore();
+        for (let i = playerIndex + 12; i >= Math.max(0, playerIndex - 3); i--) { let pos = getOffset(i); drawSnowyBlock(ctx, pos.x, pos.y, i === playerIndex); }
+        drawTank(ctx, 0, 0, playerFacing); ctx.restore();
     }
 
     function gameLoop() {
-        if (gameState === 'PLAYING') {
-            update();
-        }
-        draw();
-        updateSnow();
-        requestAnimationFrame(gameLoop);
+        if (gameState === 'PLAYING') update();
+        draw(); updateSnow(); requestAnimationFrame(gameLoop);
     }
 
-    // --- Input ---
-    function handleInput(type) {
-        if (gameState === 'MENU') return;
-        if (gameState === 'PLAYING') checkMove(type);
-    }
+    function handleInput(type) { if (gameState === 'MENU') return; if (gameState === 'PLAYING') checkMove(type); }
 
     window.addEventListener('keydown', (e) => {
         if (gameState !== 'PLAYING') return;
-        
-        if (e.code === 'KeyZ') {
-            if (isReverseMode) {
-                handleInput('CLIMB');
-            } else {
-                if (isHellMode && controlsDiv.children[0] === btnClimb) {
-                    handleInput('CLIMB');
-                } else {
-                    handleInput('TURN');
-                }
-            }
-        }
-        if (e.code === 'KeyX') {
-            if (isReverseMode) {
-                handleInput('TURN');
-            } else {
-                if (isHellMode && controlsDiv.children[1] === btnTurn) {
-                    handleInput('TURN');
-                } else {
-                    handleInput('CLIMB');
-                }
-            }
-        }
+        if (e.code === 'KeyZ') { if (isReverseMode) handleInput('CLIMB'); else { if (isHellMode && controlsDiv.children[0] === btnClimb) handleInput('CLIMB'); else handleInput('TURN'); } }
+        if (e.code === 'KeyX') { if (isReverseMode) handleInput('TURN'); else { if (isHellMode && controlsDiv.children[1] === btnTurn) handleInput('TURN'); else handleInput('CLIMB'); } }
     });
 
-    btnTurn.addEventListener('touchstart', (e) => { e.preventDefault(); handleInput('TURN'); });
-    btnTurn.addEventListener('mousedown', (e) => { e.preventDefault(); handleInput('TURN'); });
-    btnClimb.addEventListener('touchstart', (e) => { e.preventDefault(); handleInput('CLIMB'); });
-    btnClimb.addEventListener('mousedown', (e) => { e.preventDefault(); handleInput('CLIMB'); });
+    btnTurn.addEventListener('touchstart', (e) => { e.preventDefault(); handleInput('TURN'); }); btnTurn.addEventListener('mousedown', (e) => { e.preventDefault(); handleInput('TURN'); });
+    btnClimb.addEventListener('touchstart', (e) => { e.preventDefault(); handleInput('CLIMB'); }); btnClimb.addEventListener('mousedown', (e) => { e.preventDefault(); handleInput('CLIMB'); });
 
-    startBtn.addEventListener('click', validateAndStartGame);
-    restartBtn.addEventListener('click', initGame);
-    homeBtn.addEventListener('click', goToHome);
-    rankBtn.addEventListener('click', showRankings);
-    closeRankBtn.addEventListener('click', hideRankings);
-    resumeBtn.addEventListener('click', resumeGame);
-    hellResumeBtn.addEventListener('click', resumeGame);
-    revealSecretBtn.addEventListener('click', revealSecret);
-    victoryRestartBtn.addEventListener('click', goToHome);
+    startBtn.addEventListener('click', validateAndStartGame); restartBtn.addEventListener('click', initGame); homeBtn.addEventListener('click', goToHome);
+    rankBtn.addEventListener('click', showRankings); closeRankBtn.addEventListener('click', hideRankings);
+    resumeBtn.addEventListener('click', resumeGame); hellResumeBtn.addEventListener('click', resumeGame);
+    revealSecretBtn.addEventListener('click', revealSecret); victoryRestartBtn.addEventListener('click', goToHome);
 
-    // --- Firebase ---
-    function getCollectionPath() {
-        return collection(db, 'infinite_tank_scores'); 
-    }
-
+    function getCollectionPath() { return collection(db, 'infinite_tank_scores'); }
     async function saveScore(finalScore) {
-        if (!currentUser) return;
-        if (finalScore === 0) return;
-        const name = usernameInput.value || 'Soldier';
+        if (!currentUser) return; if (finalScore === 0) return; const name = usernameInput.value || 'Soldier';
         try {
-            const docRef = doc(getCollectionPath(), currentUser.uid);
-            const docSnap = await getDoc(docRef);
-            
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                if (data.score < finalScore) {
-                    await setDoc(docRef, {
-                        name: name,
-                        score: finalScore,
-                        userId: currentUser.uid,
-                        timestamp: serverTimestamp()
-                    }, { merge: true });
-                }
-            } else {
-                await setDoc(docRef, {
-                    name: name,
-                    score: finalScore,
-                    userId: currentUser.uid,
-                    timestamp: serverTimestamp()
-                });
-            }
-        } catch (e) {
-            console.error("Save Error:", e);
-        }
+            const docRef = doc(getCollectionPath(), currentUser.uid); const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) { const data = docSnap.data(); if (data.score < finalScore) await setDoc(docRef, { name: name, score: finalScore, userId: currentUser.uid, timestamp: serverTimestamp() }, { merge: true }); } 
+            else await setDoc(docRef, { name: name, score: finalScore, userId: currentUser.uid, timestamp: serverTimestamp() });
+        } catch (e) { console.error("Save Error:", e); }
     }
 
     function loadLeaderboard() {
-        if (!currentUser) return;
-        if (unsubscribeLeaderboard) unsubscribeLeaderboard();
+        if (!currentUser) return; if (unsubscribeLeaderboard) unsubscribeLeaderboard();
         const q = query(getCollectionPath());
         unsubscribeLeaderboard = onSnapshot(q, (snapshot) => {
-            const scores = [];
-            snapshot.forEach((doc) => scores.push(doc.data()));
-            scores.sort((a, b) => b.score - a.score);
-            const top10 = scores.slice(0, 10);
-            
+            const scores = []; snapshot.forEach((doc) => scores.push(doc.data())); scores.sort((a, b) => b.score - a.score); const top10 = scores.slice(0, 10);
             const renderList = (listElement) => {
-                if (!listElement) return;
-                listElement.innerHTML = '';
-                if (top10.length === 0) {
-                    listElement.innerHTML = '<div class="text-center text-gray-500 mt-2">기록 없음</div>';
-                    return;
-                }
+                if (!listElement) return; listElement.innerHTML = '';
+                if (top10.length === 0) { listElement.innerHTML = '<div class="text-center text-gray-500 mt-2">기록 없음</div>'; return; }
                 top10.forEach((item, index) => {
-                    const isMe = item.userId === currentUser.uid;
-                    const div = document.createElement('div');
+                    const isMe = item.userId === currentUser.uid; const div = document.createElement('div');
                     div.className = `flex justify-between items-center p-2 rounded ${index === 0 ? 'bg-yellow-900/40 text-yellow-200 border border-yellow-700' : 'bg-gray-800'} ${isMe ? 'border border-green-500' : ''}`;
                     div.innerHTML = `<span class="w-8 font-bold text-gray-400">${index + 1}.</span><span class="flex-1 truncate mx-2 text-white">${item.name}</span><span class="font-mono text-yellow-400 font-bold">${item.score}</span>`;
                     listElement.appendChild(div);
                 });
             };
-            
-            renderList(leaderboardList);
-            renderList(mainLeaderboardList);
-            
+            renderList(leaderboardList); renderList(mainLeaderboardList);
             const top3 = scores.slice(0, 3);
-            if(inGameRankList) {
-                inGameRankList.innerHTML = '';
-                top3.forEach((item, index) => {
-                    const div = document.createElement('div');
-                    div.className = "flex justify-between text-[10px]";
-                    div.innerHTML = `<span>${index+1}. ${item.name}</span><span class="text-yellow-400">${item.score}</span>`;
-                    inGameRankList.appendChild(div);
-                });
-            }
-
-        }, (error) => {
-            console.error("Leaderboard Error:", error);
-            const errorMsg = '<div class="text-center text-red-400 text-xs mt-4">랭킹 로드 실패<br>설정을 확인하세요</div>';
-            if(leaderboardList) leaderboardList.innerHTML = errorMsg;
-            if(mainLeaderboardList) mainLeaderboardList.innerHTML = errorMsg;
-        });
+            if(inGameRankList) { inGameRankList.innerHTML = ''; top3.forEach((item, index) => { const div = document.createElement('div'); div.className = "flex justify-between text-[10px]"; div.innerHTML = `<span>${index+1}. ${item.name}</span><span class="text-yellow-400">${item.score}</span>`; inGameRankList.appendChild(div); }); }
+        }, (error) => { console.error("Leaderboard Error:", error); });
     }
     
-    // 페이지 로드 후, 사용자 인터랙션 발생 시 배경 음악 자동 재생 시도
-    document.addEventListener('click', function() {
-       if (bgm && bgm.paused && gameState === 'PLAYING') {
-           bgm.play().catch(()=>{});
-       }
-    }, { once: true });
-
-    resize();
-    initSnow();
-    initializeStairs(); 
-    requestAnimationFrame(gameLoop);
+    resize(); initSnow(); initializeStairs(); requestAnimationFrame(gameLoop);
 
 </script>
 </body>
