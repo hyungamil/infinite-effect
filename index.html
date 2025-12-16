@@ -405,9 +405,11 @@
     let appId;
 
     if (typeof __firebase_config !== 'undefined') {
+        // Canvas Test Env
         firebaseConfig = JSON.parse(__firebase_config);
         appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
     } else {
+        // User Hosted Env (Infinite Effect)
         firebaseConfig = {
             apiKey: "AIzaSyAeSmWC9q32i9Px_hljTKvewql6At5v8MU",
             authDomain: "infinite-effect.firebaseapp.com",
@@ -428,11 +430,7 @@
 
     async function initFirebase() {
         try {
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                 await signInAnonymously(auth); 
-            } else {
-                await signInAnonymously(auth);
-            }
+            await signInAnonymously(auth);
         } catch (error) {
             console.error("Auth Error:", error);
         }
@@ -556,23 +554,16 @@
     // High DPI Handling
     function resize() {
         const dpr = window.devicePixelRatio || 1;
-        
-        // CSS Size
         canvas.style.width = window.innerWidth + 'px';
         canvas.style.height = window.innerHeight + 'px';
         snowCanvas.style.width = window.innerWidth + 'px';
         snowCanvas.style.height = window.innerHeight + 'px';
-        
-        // Bitmap Size
         canvas.width = window.innerWidth * dpr;
         canvas.height = window.innerHeight * dpr;
         snowCanvas.width = window.innerWidth * dpr;
         snowCanvas.height = window.innerHeight * dpr;
-        
-        // Normalize Scale
-        ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset
+        ctx.setTransform(1, 0, 0, 1, 0, 0); 
         ctx.scale(dpr, dpr);
-        
         snowCtx.setTransform(1, 0, 0, 1, 0, 0);
         snowCtx.scale(dpr, dpr);
     }
@@ -581,7 +572,6 @@
     // --- Snow ---
     function initSnow() {
         snowflakes = [];
-        // Use logical dimensions for snow logic (not dpr scaled)
         for(let i=0; i<MAX_SNOWFLAKES; i++) {
             snowflakes.push({
                 x: Math.random() * window.innerWidth,
@@ -595,8 +585,6 @@
     }
 
     function updateSnow() {
-        // Clear full canvas (using width/height which are dpr scaled) but logic is logical
-        // But clearRect uses logical coords if context is scaled
         snowCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
         snowCtx.fillStyle = "rgba(255, 255, 255, 0.7)";
         snowCtx.beginPath();
@@ -604,10 +592,8 @@
             let p = snowflakes[i];
             snowCtx.moveTo(p.x, p.y);
             snowCtx.arc(p.x, p.y, p.r, 0, Math.PI*2, true);
-            
             p.y += p.vy;
             p.x += p.vx + Math.sin(Date.now() * 0.001 + p.d) * 0.5;
-
             if(p.y > window.innerHeight) {
                 p.y = -10;
                 p.x = Math.random() * window.innerWidth;
@@ -625,7 +611,6 @@
         secretClickCount++;
         clearTimeout(secretTimer);
         secretTimer = setTimeout(() => { secretClickCount = 0; }, 500);
-        
         if (secretClickCount >= 3) {
             secretClickCount = 0;
             activateCheat();
@@ -644,7 +629,6 @@
             score = 999;
             energyDrainRate = 1.3;
         }
-
         if (prevScore !== score) {
             scoreDisplay.textContent = score;
             scoreDisplay.style.color = '#4ade80';
@@ -707,15 +691,12 @@
         gameOverModal.classList.add('hidden');
         victoryModal.classList.add('hidden');
         startModal.classList.remove('hidden');
-        
         gameContainer.classList.remove('whiteout-effect');
         canvas.style.transform = 'rotate(0deg)';
         energyBar.style.width = '100%';
         score = 0;
         scoreDisplay.textContent = 0;
-        
-        initializeStairs(); // Re-init so bg looks good
-        
+        initializeStairs(); 
         if (controlsDiv.children[0] !== btnTurn) {
             controlsDiv.insertBefore(btnTurn, btnClimb);
         }
@@ -1006,7 +987,6 @@
     }
 
     function draw() {
-        // Prevent drawing if stairs not initialized
         if (!stairs || stairs.length === 0) return;
 
         ctx.save();
@@ -1052,7 +1032,6 @@
         if (gameState === 'PLAYING') {
             update();
         }
-        // Always draw to keep background/snow active even in menu
         draw();
         updateSnow();
         requestAnimationFrame(gameLoop);
@@ -1158,14 +1137,19 @@
             };
             renderList(leaderboardList);
             renderList(mainLeaderboardList);
+        }, (error) => {
+            console.error("Leaderboard Error:", error);
+            const errorMsg = '<div class="text-center text-red-400 text-xs mt-4">랭킹 로드 실패<br>설정을 확인하세요</div>';
+            if(leaderboardList) leaderboardList.innerHTML = errorMsg;
+            if(mainLeaderboardList) mainLeaderboardList.innerHTML = errorMsg;
         });
     }
     
     // Init on load
     resize();
     initSnow();
-    initializeStairs(); // Start stairs so bg draws
-    requestAnimationFrame(gameLoop); // Start loop immediately
+    initializeStairs(); 
+    requestAnimationFrame(gameLoop);
 
 </script>
 </body>
