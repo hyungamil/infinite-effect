@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>무한의 전차 : 비밀 훈련소</title>
+    <title>무한의 전차 : 비밀 훈련소 (HELL MODE)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
@@ -29,6 +29,7 @@
             justify-content: center;
             background: linear-gradient(to bottom, #cfd9df 0%, #e2ebf0 100%);
             transition: filter 1s ease;
+            overflow: hidden; /* 회전 시 스크롤 방지 */
         }
         canvas {
             position: absolute;
@@ -191,6 +192,41 @@
             cursor: not-allowed !important;
             opacity: 0.7;
         }
+
+        /* --- 헬 모드 전용 효과 (추가됨) --- */
+        
+        /* 1. 눈보라 레이어 (화면 하얗게) */
+        #blizzard-layer {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: white;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 8; /* 눈 내리는 캔버스보다 위 */
+            transition: opacity 2s ease;
+            mix-blend-mode: hard-light;
+        }
+        #blizzard-layer.active {
+            animation: blizzard-pulse 4s infinite alternate;
+        }
+        @keyframes blizzard-pulse {
+            0% { opacity: 0.85; }
+            50% { opacity: 0.95; } /* 거의 안 보임 */
+            100% { opacity: 0.88; }
+        }
+
+        /* 2. 현기증 효과 (화면 회전) */
+        .active-dizziness {
+            animation: dizziness-spin 3s infinite ease-in-out !important;
+        }
+        @keyframes dizziness-spin {
+            0% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(-5deg) scale(1.1); } /* 여백 방지 확대 */
+            50% { transform: rotate(0deg) scale(1); }
+            75% { transform: rotate(5deg) scale(1.1); }
+            100% { transform: rotate(0deg) scale(1); }
+        }
+
     </style>
 </head>
 <body>
@@ -198,6 +234,14 @@
 <div id="game-container">
     <canvas id="gameCanvas"></canvas>
     <canvas id="snow-canvas"></canvas>
+    
+    <!-- 오디오 태그 추가 (화면엔 안 보임) -->
+    <audio id="bgm" loop preload="auto">
+        <source src="Pixel Rush.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- 눈보라 효과 레이어 -->
+    <div id="blizzard-layer"></div>
 
     <!-- UI 레이어 -->
     <div class="ui-layer">
@@ -232,7 +276,7 @@
             </div>
         </div>
 
-        <div id="shuffleAlert" class="font-bold">⚠ 버튼 이동! ⚠</div>
+        <div id="shuffleAlert" class="font-bold">⚠ HELL MODE ⚠</div>
         <div class="h-[25vh]"></div>
     </div>
 
@@ -251,14 +295,14 @@
     <!-- 시작 화면 -->
     <div id="startModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm interactive px-4">
         <div class="military-panel p-6 w-full max-w-sm text-center rounded-lg border-green-900/50 relative">
-            <h1 class="text-4xl md:text-5xl mb-2 text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]" style="font-family: 'Black Han Sans'; letter-spacing: -1px;">무한의 전차<br><span class="text-2xl text-gray-400 font-normal tracking-widest">WINTER WAR</span></h1>
+            <h1 class="text-4xl md:text-5xl mb-2 text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]" style="font-family: 'Black Han Sans'; letter-spacing: -1px;">무한의 전차<br><span class="text-2xl text-gray-400 font-normal tracking-widest">HELL TRAINING</span></h1>
             
             <div class="bg-black/40 p-4 rounded mb-4 border border-gray-700">
-                <p class="text-yellow-400 font-bold mb-2 text-lg">"무한의 계단 고수가 되는 법"</p>
+                <p class="text-yellow-400 font-bold mb-2 text-lg">"지옥 훈련소에 온 걸 환영한다"</p>
                 <p class="text-gray-300 text-sm leading-relaxed word-keep-all">
-                    이 비급을 전수받고 싶으신가요?<br>
-                    그렇다면 혹한의 전장에서 살아남아<br>
-                    자격을 증명하십시오.
+                    750점 고지를 넘어서면<br>
+                    진정한 지옥을 맛보게 될 것이다.<br>
+                    살아서 돌아온 자는 없다.
                 </p>
                 <p class="text-red-400 mt-2 font-bold animate-pulse">목표: 1000 포인트 달성</p>
             </div>
@@ -333,16 +377,16 @@
     <!-- 헬 모드 모달 -->
     <div id="hellModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-purple-900/40 backdrop-blur-sm interactive px-4 hidden">
         <div class="military-panel-purple p-6 w-full max-w-sm text-center rounded-lg relative overflow-hidden">
-            <h2 class="text-4xl text-purple-400 mb-4 font-black tracking-tighter hell-blink">⚠ 지옥 모드 ⚠</h2>
-            <p class="text-white text-lg font-mono mb-2">계기판 오작동</p>
+            <h2 class="text-4xl text-purple-400 mb-4 font-black tracking-tighter hell-blink">⚠ 헬 모드 ⚠</h2>
+            <p class="text-white text-lg font-mono mb-2">시야/평형 감각 상실</p>
             <p class="text-purple-300 text-sm font-mono mb-6 border-y border-purple-800 py-2 leading-relaxed">
-                버튼이 제멋대로 이동합니다!<br>
-                눈을 크게 뜨고 확인하십시오.<br>
+                눈보라가 몰아치고<br>
+                화면이 어지럽게 회전합니다!<br>
                 <span class="text-green-400 block mt-2 font-bold">에너지 충전 완료.</span>
             </p>
             
             <button id="hellResumeBtn" class="w-full bg-purple-900 hover:bg-purple-800 text-white font-bold py-4 rounded border border-purple-500 shadow-[0_0_15px_rgba(128,0,128,0.4)] transition font-mono tracking-widest text-xl">
-                생존하라
+                지옥에서 생존하라
             </button>
         </div>
     </div>
@@ -353,7 +397,7 @@
             <h2 class="text-4xl text-yellow-400 mb-4 font-black tracking-tighter">작전 성공</h2>
             <p class="text-white text-md font-mono mb-6 leading-relaxed break-keep">
                 축하합니다, 사령관님.<br>
-                모든 시련을 통과하고 살아남으셨습니다.<br><br>
+                지옥 훈련을 통과하고 살아남으셨습니다.<br><br>
                 이제 1급 기밀인<br>
                 <span class="text-yellow-300 font-bold">'무한의 계단 고수 비법'</span>을<br>
                 열람하시겠습니까?
@@ -417,7 +461,6 @@
     import { getFirestore, collection, addDoc, setDoc, getDoc, getDocs, doc, onSnapshot, query, where, orderBy, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // --- Firebase Setup ---
-    // ALWAYS use User's Config (Infinite Effect)
     const firebaseConfig = {
         apiKey: "AIzaSyAeSmWC9q32i9Px_hljTKvewql6At5v8MU",
         authDomain: "infinite-effect.firebaseapp.com",
@@ -440,7 +483,6 @@
             await signInAnonymously(auth);
         } catch (error) {
             console.error("Auth Error:", error);
-            // Even if auth fails, ensure UI is usable (offline mode)
             const startBtn = document.getElementById('startBtn');
             if(startBtn) {
                 startBtn.textContent = "오프라인 모드";
@@ -469,6 +511,7 @@
     const snowCanvas = document.getElementById('snow-canvas');
     const snowCtx = snowCanvas.getContext('2d');
     const gameContainer = document.getElementById('game-container');
+    const blizzardLayer = document.getElementById('blizzard-layer');
     
     // UI Elements
     const startModal = document.getElementById('startModal');
@@ -503,6 +546,9 @@
     const statusPanel = document.getElementById('statusPanel');
     const secretTrigger = document.getElementById('secretTrigger');
     
+    // 배경음악 요소
+    const bgm = document.getElementById('bgm');
+
     // Buttons
     const controlsDiv = document.querySelector('.controls');
     const btnTurn = document.getElementById('btnTurn');
@@ -528,7 +574,6 @@
     
     let isReverseMode = false;
     let isHellMode = false;
-    let lastShuffleTime = 0;
     
     // Snow
     let snowflakes = [];
@@ -536,6 +581,23 @@
     let shakeIntensity = 0;
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     
+    // 배경음악 재생 함수
+    function playBGM() {
+        if (bgm) {
+            bgm.volume = 0.5; // 볼륨 50%
+            bgm.play().catch(e => {
+                console.log("Autoplay prevented by browser. Music will start on interaction.");
+            });
+        }
+    }
+
+    function stopBGM() {
+        if (bgm) {
+            bgm.pause();
+            bgm.currentTime = 0;
+        }
+    }
+
     function playSound(type) {
         if (audioCtx.state === 'suspended') audioCtx.resume();
         try {
@@ -676,7 +738,6 @@
 
     async function validateAndStartGame() {
         if (!currentUser) {
-            // Offline fallback
             const name = usernameInput.value.trim();
             if (!name) {
                 usernameInput.classList.add('input-error');
@@ -694,9 +755,7 @@
             return;
         }
 
-        // [New] Check Duplication
         try {
-            // Check with short timeout
             const checkPromise = new Promise(async (resolve, reject) => {
                 const q = query(getCollectionPath(), where("name", "==", name));
                 const snapshot = await getDocs(q);
@@ -745,16 +804,23 @@
         scoreDisplay.style.color = 'white';
         shuffleAlert.style.opacity = '0';
         
+        // 버튼 순서 초기화
         if (controlsDiv.children[0] !== btnTurn) {
             controlsDiv.insertBefore(btnTurn, btnClimb);
         }
         
+        // 헬 모드 효과 제거
+        blizzardLayer.classList.remove('active');
+        gameContainer.classList.remove('active-dizziness');
         gameContainer.classList.remove('whiteout-effect');
         canvas.style.transform = 'rotate(0deg)';
         
         initializeStairs();
         gameState = 'PLAYING';
         
+        // 게임 시작 시 음악 재생 시도
+        playBGM();
+
         startModal.classList.add('hidden');
         rankingModal.classList.add('hidden');
         gameOverModal.classList.add('hidden');
@@ -766,10 +832,18 @@
 
     function goToHome() {
         gameState = 'MENU';
+        // 홈으로 가면 음악 정지 (선택 사항)
+        stopBGM();
+        
         gameOverModal.classList.add('hidden');
         victoryModal.classList.add('hidden');
         startModal.classList.remove('hidden');
+        
+        // 효과 제거
+        blizzardLayer.classList.remove('active');
+        gameContainer.classList.remove('active-dizziness');
         gameContainer.classList.remove('whiteout-effect');
+        
         canvas.style.transform = 'rotate(0deg)';
         energyBar.style.width = '100%';
         score = 0;
@@ -802,13 +876,21 @@
         hellModal.classList.remove('hidden');
         isHellMode = true;
         isReverseMode = false;
-        lastShuffleTime = Date.now();
+        
+        // 헬 모드에서는 버튼 정상 위치로 (시각 효과에 집중)
         if (controlsDiv.children[0] !== btnTurn) {
             controlsDiv.insertBefore(btnTurn, btnClimb);
         }
+        
+        // 시각 효과 적용 (눈보라 + 현기증)
+        blizzardLayer.classList.add('active');
+        gameContainer.classList.add('active-dizziness');
+        
         energy = MAX_ENERGY;
         energyBar.style.width = '100%';
-        statusText.textContent = "⚠ 카멜레온 ⚠";
+        
+        // UI 텍스트 변경
+        statusText.textContent = "⚠ HELL MODE ⚠";
         statusText.className = "text-xs text-purple-400 font-mono tracking-widest hell-blink";
         statusPanel.className = "military-panel-purple p-2 rounded px-4";
     }
@@ -883,9 +965,11 @@
     }
 
     function gameOver() {
-        // [Safety] Force UI Show first
         if(gameOverModal) gameOverModal.classList.remove('hidden');
         
+        // 게임 오버 시 음악 정지
+        stopBGM();
+
         gameState = 'GAMEOVER';
         playSound('error');
         
@@ -896,7 +980,6 @@
             if(bestDisplay) bestDisplay.textContent = bestScore;
         }
         
-        // Attempt save safely - without blocking
         saveScore(score).catch(e => console.log('Save skipped'));
     }
 
@@ -911,19 +994,6 @@
         }
         
         if (shakeIntensity > 0) shakeIntensity *= 0.9;
-        
-        if (isHellMode) {
-            if (Date.now() - lastShuffleTime > 3000) {
-                lastShuffleTime = Date.now();
-                if (controlsDiv.children[0] === btnTurn) {
-                    controlsDiv.insertBefore(btnClimb, btnTurn);
-                } else {
-                    controlsDiv.insertBefore(btnTurn, btnClimb);
-                }
-                shuffleAlert.style.opacity = '1';
-                setTimeout(() => { shuffleAlert.style.opacity = '0'; }, 1000);
-            }
-        }
     }
 
     // --- Drawing ---
@@ -1176,7 +1246,6 @@
 
     // --- Firebase ---
     function getCollectionPath() {
-        // Always use consistent collection name
         return collection(db, 'infinite_tank_scores'); 
     }
 
@@ -1240,7 +1309,6 @@
             renderList(leaderboardList);
             renderList(mainLeaderboardList);
             
-            // 인게임 랭킹 (Top 3)
             const top3 = scores.slice(0, 3);
             if(inGameRankList) {
                 inGameRankList.innerHTML = '';
@@ -1260,7 +1328,13 @@
         });
     }
     
-    // Init on load
+    // 페이지 로드 후, 사용자 인터랙션 발생 시 배경 음악 자동 재생 시도
+    document.addEventListener('click', function() {
+       if (bgm && bgm.paused && gameState === 'PLAYING') {
+           bgm.play().catch(()=>{});
+       }
+    }, { once: true });
+
     resize();
     initSnow();
     initializeStairs(); 
